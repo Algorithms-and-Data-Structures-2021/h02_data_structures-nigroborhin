@@ -13,10 +13,10 @@ namespace itis {
         // Tip 3: не забудьте обновить поля head и tail
         // напишите свой код здесь ...
         Node *new_node = new Node(e, nullptr);
-        if (size_ == 0) {
+        if (IsEmpty()) {
             head_ = new_node;
         } else {
-            tail_ -> next = new_node;
+            tail_->next = new_node;
         }
         tail_ = new_node;
         size_++;
@@ -30,14 +30,33 @@ namespace itis {
         //        (2) добавляем в начало списка,
         //        (3) добавляем в конец списка
         //        (4) все остальное
-
         // напишите свой код здесь ...
+        if (size_ == 0) {
+            Node *new_node = new Node(e, nullptr);
+            head_ = new_node;
+        } else if (index == 0) {
+            head_ = new Node(e, head_);
+        } else if (index == size_) {
+            Node *new_node = new Node(e, nullptr);
+            tail_->next = new_node;
+            tail_ = new_node;
+        } else {
+            Node *previous = head_;
+            for (int i = 0; i < index - 1; ++i) {
+                previous = previous->next;
+            }
+            Node *new_node = new Node(e, previous->next);
+            previous->next = new_node;
+        }
+        size_++;
     }
 
     void LinkedList::Set(int index, Element e) {
         internal::check_out_of_range(index, 0, size_);
         // Tip 1: используйте функцию find_node(index)
         // напишите свой код здесь ...
+        Node *this_node = find_node(index);
+        this_node->data = e;
     }
 
     Element LinkedList::Remove(int index) {
@@ -45,30 +64,79 @@ namespace itis {
         // Tip 1: рассмотрите случай, когда удаляется элемент в начале списка
         // Tip 2: используйте функцию find_node(index)
         // напишите свой код здесь ...
-        return {};
+        Element element_to_return;
+        if (index == 0) {
+            Node *temp = head_;
+            head_ = head_->next;
+            element_to_return = temp->data;
+            delete temp;
+        } else {
+            Node *previous = find_node(index - 1);
+            Node *to_delete = find_node(index);
+            previous->next = to_delete->next;
+            element_to_return = to_delete->data;
+            delete to_delete;
+        }
+        size_--;
+        return element_to_return;
     }
 
     void LinkedList::Clear() {
         // Tip 1: люди в черном (MIB) пришли стереть вам память
         // напишите свой код здесь ...
+        while (size_ > 0) {
+            Node *temp = head_;
+            head_ = head_->next;
+            delete temp;
+            size_--;
+        }
+        tail_ = nullptr;
     }
 
     Element LinkedList::Get(int index) const {
         internal::check_out_of_range(index, 0, size_);
         // напишите свой код здесь ...
-        return {};
+        return find_node(index)->data;
     }
 
     int LinkedList::IndexOf(Element e) const {
         // напишите свой код здесь ...
-        return {};
+        if (!IsEmpty()){
+            if (head_->data == e) {
+                return (0);
+            }
+            Node *this_node = head_;
+            for (int i = 0; i < size_; ++i) {
+                if (this_node->data == e) {
+                    return i;
+                } else {
+                    this_node = this_node->next;
+                }
+            }
+        }
+        return -1;
     }
 
     Node *LinkedList::find_node(int index) const {
         assert(index >= 0 && index < size_);
         // Tip 1: можете сразу обработать случаи поиска начала и конца списка
         // напишите свой код здесь ...
-        return {};
+        int counter = 0;
+        Node *this_node = this->head_;
+        if (index == 0) {
+            return head_;
+        }
+        if (index == GetSize() - 1) {
+            return tail_;
+        }
+        while (this_node != nullptr) {
+            if (counter == index) {
+                return this_node;
+            }
+            this_node = this_node->next;
+            counter++;
+        }
+        return nullptr;
     }
 
 // РЕАЛИЗОВАНО
